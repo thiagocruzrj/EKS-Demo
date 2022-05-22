@@ -9,10 +9,10 @@ namespace Atturra.TaxCalculator.Options.Deductions
         public virtual int Value { get; set; }
         public virtual List<ExcessOption> ExcessOptions { get; set; }
 
-        public DeductionBase(int taxableIncome, List<ExcessOption> excessOptions)
+        public DeductionBase(List<ExcessOption> excessOptions, decimal taxableIncome)
         {
-            Value = CalculateExcess(taxableIncome);
             ExcessOptions = excessOptions;
+            Value = CalculateExcess(taxableIncome);
         }
 
         internal virtual int CalculateExcess(decimal taxableIncome)
