@@ -1,4 +1,5 @@
-﻿using Atturra.TaxCalculator.Options.Deductions;
+﻿using Atturra.TaxCalculator.Options;
+using Atturra.TaxCalculator.Options.Deductions;
 
 namespace Atturra.TaxCalculator.Entities
 {
@@ -8,11 +9,11 @@ namespace Atturra.TaxCalculator.Entities
         public BudgetRepairLevyDeduction BudgetRepairLevy { get; set; }
         public IncomeTaxDeduction IncomeTax { get; set; }
 
-        public Deduction(MedicareLevyDeduction medicareLevy, BudgetRepairLevyDeduction budgetRepairLevy, IncomeTaxDeduction incomeTax)
+        public Deduction(decimal incomeTax, DeductionOptions options)
         {
-            MedicareLevy = medicareLevy;
-            BudgetRepairLevy = budgetRepairLevy;
-            IncomeTax = incomeTax;
+            MedicareLevy = new MedicareLevyDeduction(options.MedicareExcess, incomeTax);
+            BudgetRepairLevy = new BudgetRepairLevyDeduction(options.BudgetRepairExcess, incomeTax);
+            IncomeTax = new IncomeTaxDeduction(options.IncomeTaxExcess, incomeTax);
         }
 
         public int TotalDeduction => MedicareLevy.Value + BudgetRepairLevy.Value + IncomeTax.Value;
