@@ -1,9 +1,12 @@
-﻿namespace Atturra.TaxCalculator.Options
+﻿using System.Collections.Generic;
+
+namespace Atturra.TaxCalculator.Options
 {
     public class DeductionOptions
     {
-        public decimal MedicareExcess { get; set; }
-        public decimal BudgetRepairExcess { get; set; }
-        public decimal IncomeTaxExcess { get; set; }
+        public List<ExcessOption> MedicareExcess { get; set; }
+        public List<ExcessOption> BudgetRepairExcess { get; set; }
+        public List<ExcessOption> IncomeTaxExcess { get; set; }
+        public decimal SuperRate { get; set; }
     }
 }
