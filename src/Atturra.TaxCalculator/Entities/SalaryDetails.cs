@@ -7,7 +7,6 @@ namespace Atturra.TaxCalculator.Entities
 {
     public class SalaryDetails
     {
-        [Range(1.0, double.MaxValue, ErrorMessage = "Please enter a value bigger than {1}")]
         public decimal GrossPackage { get; set; }
         public decimal Superannuation { get; set; }
         public PayFrequency PayFrequency { get; set; }
