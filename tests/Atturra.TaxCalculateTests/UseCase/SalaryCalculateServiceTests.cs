@@ -6,11 +6,12 @@ using System;
 using System.Collections.Generic;
 using Xunit;
 
-namespace SalaryPackage.Application.Test
+namespace Atturra.TaxCalculatorTests.UseCase
 {
     public class SalaryCalculateServiceTests
     {
         private readonly SalaryCalculateService _sut;
+        private readonly SalaryReportService _report;
         private readonly IOptions<DeductionOptions> _options;
 
         public SalaryCalculateServiceTests()
@@ -64,12 +65,13 @@ namespace SalaryPackage.Application.Test
                 }
             });
             _sut = new SalaryCalculateService(_options);
+            _report = new SalaryReportService();
         }
 
         [Theory]
         [InlineData("", "M")]
         [InlineData("NotDecimal", "M")]
-        public void SalaryReport_throws_error_when_gross_package_is_not_decimal(string grossPackage, string payFrequency)
+        public void SalaryReport_ThrowsError_WhenNotNumericInformed(string grossPackage, string payFrequency)
         {
             // Act
             void act() => _sut.CalculateSalaryTaxes(grossPackage, payFrequency);
@@ -83,7 +85,7 @@ namespace SalaryPackage.Application.Test
         [InlineData("-0.1", "M")]
         [InlineData("-180000", "M")]
         [InlineData("0", "M")]
-        public void SalaryReport_throws_error_when_gross_package_is_invalid(string grossPackage, string payFrequency)
+        public void SalaryReport_ThrowsError_WhenGrossIsLowerOrEqualZero(string grossPackage, string payFrequency)
         {
             // Act
             void act() => _sut.CalculateSalaryTaxes(grossPackage, payFrequency);
@@ -96,7 +98,7 @@ namespace SalaryPackage.Application.Test
         [Theory]
         [InlineData("1", "")]
         [InlineData("1", "A")]
-        public void SalaryReport_throws_error_when_pay_frequency_is_invalid(string grossPackage, string payFrequency)
+        public void SalaryReport_ThrowsError_WhenPayFrequencyIsInvalid(string grossPackage, string payFrequency)
         {
             // Act
             void act() => _sut.CalculateSalaryTaxes(grossPackage, payFrequency);
@@ -109,7 +111,7 @@ namespace SalaryPackage.Application.Test
         [Theory]
         [InlineData("27375", "M", 367)]
         [InlineData("43800", "M", 800)]
-        public void SalaryReport_returns_correct_medicare_levy(string grossPackage, string payFrequency, int expectedAmount)
+        public void SalaryReport_MedicareLevy_ResultShouldBeCorrect(string grossPackage, string payFrequency, int expectedAmount)
         {
             // Act
             var result = _sut.CalculateSalaryTaxes(grossPackage, payFrequency);
@@ -120,7 +122,7 @@ namespace SalaryPackage.Application.Test
 
         [Theory]
         [InlineData("219000", "M", 400)]
-        public void SalaryReport_returns_correct_budget_repair_levy(string grossPackage, string payFrequency, int expectedAmount)
+        public void SalaryReport_BudgetRepairLevy_ResultShouldBeCorrect(string grossPackage, string payFrequency, int expectedAmount)
         {
             // Act
             var result = _sut.CalculateSalaryTaxes(grossPackage, payFrequency);
@@ -135,7 +137,7 @@ namespace SalaryPackage.Application.Test
         [InlineData("104025", "M", 22782)]
         [InlineData("197100", "M", 54232)]
         [InlineData("219000", "M", 63632)]
-        public void SalaryReport_returns_correct_income_tax(string grossPackage, string payFrequency, int expectedAmount)
+        public void SalaryReport_IncomeTax_ShouldBeCorrect(string grossPackage, string payFrequency, int expectedAmount)
         {
             // Act
             var result = _sut.CalculateSalaryTaxes(grossPackage, payFrequency);
@@ -145,7 +147,7 @@ namespace SalaryPackage.Application.Test
         }
 
         [Fact]
-        public void SalaryReport_returns_salary_when_input_is_good()
+        public void SalaryReport_SalaryInformation_ShouldBeCorrect()
         {
             // Arrange
             var grossPackage = "65000";
@@ -163,6 +165,36 @@ namespace SalaryPackage.Application.Test
             Assert.Equal(10839, result.Deduction.IncomeTax.Value);
             Assert.Equal(47333.73M, result.NetIncome);
             Assert.Equal(3944.48M, result.SalaryPackage);
+        }
+
+        [Fact]
+        public void SalaryReport_SalaryReport_ShouldBeCorrect()
+        {
+            // Arrange
+            var grossPackage = "65000";
+            var payFrequency = PayFrequency.M.ToString();
+
+            // Act
+            var report = _report.SalaryReportString(_sut.CalculateSalaryTaxes(grossPackage, payFrequency));
+
+            var finalReport = $@"
+                    Calculating salary details...
+
+                    Gross package: 65000
+                    Superannuation: 5639.27
+
+                    Taxable income: 59360.73
+
+                    Deductions:
+                    Medicare Levy: 1188
+                    Budget Repair Levy: 0
+                    Income Tax: 10839
+
+                    Net income: 47333.73
+                    Pay packet: 3944.48 per M";
+
+            // Assert
+            Assert.Equal(report, finalReport);
         }
     }
 }

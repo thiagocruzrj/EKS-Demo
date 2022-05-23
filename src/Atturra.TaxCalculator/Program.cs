@@ -1,10 +1,7 @@
-﻿using Atturra.TaxCalculator.Extensions;
+﻿using Atturra.TaxCalculator.Configuration;
 using Atturra.TaxCalculator.Intefaces;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using System;
-using System.Reflection;
 
 namespace Atturra.TaxCalculator
 {
@@ -12,7 +9,7 @@ namespace Atturra.TaxCalculator
     {
         static void Main(string[] args)
         {
-            var serviceProvider = ConfigureServices();
+            var serviceProvider = DependencyConfig.ConfigureServices();
             var salaryCalculateService = serviceProvider.GetService<ISalaryCalculateService>();
             var reportService = serviceProvider.GetService<ISalaryReportService>();
 
@@ -20,7 +17,7 @@ namespace Atturra.TaxCalculator
             var grossPackage = Console.ReadLine();
 
             Console.Write("Enter your pay frequency (W for weekly, F for fortnightly, M for monthly): ");
-            var payFrequency = Console.ReadLine();
+            var payFrequency = Console.ReadLine().ToLower();
 
             try
             {
@@ -31,24 +28,6 @@ namespace Atturra.TaxCalculator
             {
                 Console.WriteLine(ex);
             }
-        }
-
-        private static IServiceProvider ConfigureServices()
-        {
-            var services = new ServiceCollection();
-            var configuration = BuildConfiguration();
-            services.AddApplicationServices(configuration);
-            return services.BuildServiceProvider();
-        }
-
-        private static IConfiguration BuildConfiguration()
-        {
-            var embeddedProvider = new EmbeddedFileProvider(Assembly.GetExecutingAssembly());
-            var configBuilder = new ConfigurationBuilder();
-            configBuilder
-                .AddJsonFile(embeddedProvider, "appsettings.json", optional: false, reloadOnChange: false);
-
-            return configBuilder.Build();
         }
     }
 }

@@ -6,6 +6,8 @@ namespace Atturra.TaxCalculator.Services
 {
     public class SalaryReportService : ISalaryReportService
     {
+        public SalaryReportService() { }
+
         public void SalaryReport(SalaryDetails salary)
         {
             Console.WriteLine(SalaryReportString(salary));
