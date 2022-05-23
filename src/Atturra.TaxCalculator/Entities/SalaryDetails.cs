@@ -26,9 +26,9 @@ namespace Atturra.TaxCalculator.Entities
         public decimal NetIncome => TaxableIncome - Deduction.TotalDeduction;
 
         public decimal SalaryPackage =>
-            PayFrequency.Equals(PayFrequency.Monthly)
+            PayFrequency.Equals(PayFrequency.W)
             ? Math.Round(NetIncome / 52, 2)
-            : PayFrequency.Equals(PayFrequency.Fortnightly)
+            : PayFrequency.Equals(PayFrequency.F)
             ? Math.Round(NetIncome / 26, 2)
             : Math.Round(NetIncome / 12, 2);
     }
